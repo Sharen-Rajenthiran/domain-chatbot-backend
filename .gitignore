@@ -127,7 +127,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-foodiego-chatbot/
+domain-chatbot-backend-venv/
 
 # Spyder project settings
 .spyderproject
