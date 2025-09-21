@@ -1,13 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
 from config import settings
-from api.chat import router as chat_router
+from api.chats import router as chats_router
+from api.documents import router as documents_router
 from logging_config import logger
+from models import HealthResponse
 
-# Create FastAPI application
+
 app = FastAPI(
     title="Domain Chatbot API",
-    description="AI-powered chatbot for domain specific",
+    description="AI-powered chatbot for domain-specific document Q&A",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
@@ -18,14 +21,23 @@ logger.info("Starting Domain Chatbot API")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(chat_router, prefix="/api/v1", tags=["chat"])
+# Include routers with proper prefixes
+app.include_router(
+    chats_router, 
+    prefix=f"{settings.api_prefix}", 
+    tags=["chats"]
+)
+app.include_router(
+    documents_router, 
+    prefix=f"{settings.api_prefix}", 
+    tags=["documents"]
+)
 
 
 @app.get("/")
@@ -39,17 +51,21 @@ async def root():
     }
 
 
-@app.get("/health")
+@app.get("/health", response_model=HealthResponse)
 async def health():
     """Health check endpoint."""
     logger.info("Health check endpoint accessed")
-    return {"status": "healthy", "message": "Service is running"}
+    return HealthResponse(
+        status="healthy", 
+        message="Service is running",
+        timestamp=datetime.utcnow().isoformat() + "Z"
+    )
 
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "app.main:app",
+        "main:app",
         host=settings.host,
         port=settings.port,
         reload=settings.debug
