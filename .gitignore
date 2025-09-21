@@ -294,3 +294,8 @@ temp/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Project specific
+debug_numpy.py
+test_app.py
+test_chat_ids.py
