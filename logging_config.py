@@ -38,15 +38,15 @@ def setup_logging(level: Optional[str] = None) -> logging.Logger:
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
     
-    # File handler (optional - for production)
-    if not settings.debug:
-        try:
-            file_handler = logging.FileHandler('domain-chatbot-backend.log')
-            file_handler.setLevel(logging.INFO)
-            file_handler.setFormatter(formatter)
-            logger.addHandler(file_handler)
-        except Exception as e:
-            logger.warning(f"Could not create file handler: {e}")
+    # File handler - always create for logging
+    try:
+        file_handler = logging.FileHandler(settings.log_file)
+        file_handler.setLevel(getattr(logging, settings.log_level.upper()))
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+        logger.info(f"File logging enabled: {settings.log_file}")
+    except Exception as e:
+        logger.warning(f"Could not create file handler: {e}")
     
     # Prevent duplicate logs
     logger.propagate = False
