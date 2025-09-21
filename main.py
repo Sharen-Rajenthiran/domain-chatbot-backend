@@ -6,6 +6,7 @@ from api.chats import router as chats_router
 from api.documents import router as documents_router
 from logging_config import logger
 from models import HealthResponse
+import uvicorn
 
 
 app = FastAPI(
@@ -16,7 +17,6 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-logger.info("Starting Domain Chatbot API")
 
 # Add CORS middleware
 app.add_middleware(
@@ -63,7 +63,7 @@ async def health():
 
 
 if __name__ == "__main__":
-    import uvicorn
+    logger.info("Starting Domain Chatbot API at main")
     uvicorn.run(
         "main:app",
         host=settings.host,
